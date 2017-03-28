@@ -11,9 +11,9 @@ In the stl directory are the stl files for the enclosure I have designed specifi
 I will be posting a blog post shortly with a full component list and build guide.  For more information regarding building a full talkiepi device, go check out my blog at [projectable.me](http://projectable.me).
 
 
-## Installing talkiepi
+## 安裝 talkiepi
 
-I have put together an install guide [here](doc/README.md).
+我把安裝指導放在[這裡](doc/README.md).
 
 
 ## GPIO
@@ -41,4 +41,4 @@ MPL 2.0
 
 - talkiepi - [Daniel Chote](https://github.com/dchote)
 - Barnard,Gumble Author - Tim Cooper (<tim.cooper@layeh.com>)
-
+- Translater eastWillow(bobgash2@gmail.com)
