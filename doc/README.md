@@ -1,27 +1,28 @@
-# Boot to talkiepi
+# 將 talkiepi 開機
+
 ![assembled1](talkiepi_assembled_1.jpg "Assembled talkiepi 1")
 
-This is a simple overview to scratch install talkiepi on your Raspberry Pi, and have it start on boot. 
-This document assumes that you have raspbian-jessie-lite installed on your SD card, and that the distribution is up to date.
-This document also asumes that you have already configured network/wifi connectivity on your Raspberry Pi.
+這是一個概述如何安裝talkiepi 到你的RaspberryPi 然後開機。
+這個文件假設你已經安裝了raspbian-jessie-lite 在你的SD 卡裡面，並且已經將它更新到最新版。
+這個文件也假設你已經設定好了有線網路或是WIFI 的設定。
 
-By default talkiepi will run without any arguments, it will autogenerate a username and then connect to my mumble server.
-You can change this behavior by appending commandline arguments of `-server YOUR_SERVER_ADDRESS`, `-username YOUR_USERNAME` to the ExecStart line in `/etc/systemd/system/mumble.service` once installed.
+talkiepi 預設是不使用任何設定運作的，他將會自動產生使用者帳號並且連線到我的mumble server。
+你若是想要改變上面的預設，可以透過附加這些變數：`-server YOUR_SERVER_ADDRESS`, `-username YOUR_USERNAME` 到ExecStart `/etc/systemd/system/mumble.service` 這行後面
 
-talkiepi will also accept arguments for `-password`, `-insecure`, `-certificate` and `-channel`, all defined in `cmd/talkiepi/main.go`, if you run your own mumble server, these will be self explanatory.
+talkiepi 也接受這些變數： `-password`, `-insecure`, `-certificate` and `-channel` ，這些都定義在`cmd/talkiepi/main.go` ，如果你想要改成自己的mumble 伺服器，這些變數必須由你自己設定。
 
 
-## Create a user
+## 建立使用者
 
-As root on your Raspberry Pi (`sudo -i`), create a mumble user:
+登入root 使用者(`sudo -i`)，建立一個mumble 使用者：
 ```
 adduser --disabled-password --disabled-login --gecos "" mumble
 usermod -a -G cdrom,audio,video,plugdev,users,dialout,dip,input,gpio mumble
 ```
 
-## Install
+## 安裝
 
-As root on your Raspberry Pi (`sudo -i`), install golang and other required dependencies, then build talkiepi:
+登入root 使用者(`sudo -i`)，安裝go 語言還有其他依賴的安裝包，然後安裝talkeipi：
 ```
 apt-get install golang libopenal-dev libopus-dev git
 
@@ -44,18 +45,19 @@ go build -o /home/mumble/bin/talkiepi cmd/talkiepi/main.go
 ```
 
 
-## Start on boot
+## 開機自動啟動
 
-As root on your Raspberry Pi (`sudo -i`), copy mumble.service in to place:
+登入root 使用者(`sudo -i`), 複製mumble.service 去某個地方:
 ```
 cp /home/mumble/gocode/src/github.com/dchote/talkiepi/conf/systemd/mumble.service /etc/systemd/system/mumble.service
 
 systemctl enable mumble.service
 ```
 
-## Create a certificate
+## 建立憑證(certificate)
 
-This is optional, mainly if you want to register your talkiepi against a mumble server and apply ACLs.
+這個不一定要做，主要是你想要註冊你的talkiepi 在mumble 伺服器上，並且開啟黑白名單之類的（ACLs）。
+
 ```
 su mumble
 cd ~
@@ -63,30 +65,31 @@ cd ~
 openssl genrsa -aes256 -out key.pem
 ```
 
-Enter a simple passphrase, its ok, we will remove it shortly...
+輸入一個簡單的密碼，不用擔心，我們很快就會用不到這個密碼...
+
 
 ```
 openssl req -new -x509 -key key.pem -out cert.pem -days 1095
 ```
 
-Enter your passphrase again, and fill out the certificate info as much as you like, its not really that important if you're just hacking around with this.
+再次輸入你的簡單密碼，然後選擇一個你喜歡的憑證訊息，這其實不太重要，因為你只是在做一個hacking 的東西
 
 ```
 openssl rsa -in key.pem -out nopasskey.pem
 ```
 
-Enter your password for the last time.
+輸入你的簡單密碼最後一次
 
 ```
 cat nopasskey.pem cert.pem > mumble.pem
 ```
 
-Now as root again (`sudo -i`), edit `/etc/systemd/system/mumble.service` appending `-username USERNAME_TO_REGISTER -certificate /home/mumble/mumble.pem` at the end of `ExecStart = /home/mumble/bin/talkiepi`
+登入root 使用者(`sudo -i`), 編輯 `/etc/systemd/system/mumble.service` 加上 `-username USERNAME_TO_REGISTER -certificate /home/mumble/mumble.pem` 在最後這行 `ExecStart = /home/mumble/bin/talkiepi`
 
-Run `systemctl daemon-reload` and then `service mumble restart` and you should be set with a tls certificate!
+執行 `systemctl daemon-reload` 然後 `service mumble restart` 然後你就把憑證設定好了
 
 
-## Use your USB speakerphone
+## 使用你的USB 擴音器
 
 If you are using a USB speakerphone such as the US Robotics one that I am using, you will need to change the default system sound device.
 As root on your Raspberry Pi (`sudo -i`), find your device by running `aplay -l`, take note of the index of the device (likely 1) and then edit the alsa config (`/usr/share/alsa/alsa.conf`), changing the following:
