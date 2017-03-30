@@ -72,7 +72,7 @@ openssl genrsa -aes256 -out key.pem
 openssl req -new -x509 -key key.pem -out cert.pem -days 1095
 ```
 
-再次輸入你的簡單密碼，然後選擇一個你喜歡的憑證訊息，這其實不太重要，因為你只是在做一個hacking 的東西
+先輸入一些你喜歡的憑證訊息，這其實不太重要，因為你只是在做一個hacking 的東西
 
 ```
 openssl rsa -in key.pem -out nopasskey.pem
